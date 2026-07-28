@@ -5,7 +5,7 @@ import {
   buildRequestsUrl,
   collectAllPages,
   filterByFormName,
-} from "../app/src/core/requestSearch.js";
+} from "../backend/core/requestSearch.js";
 
 test("buildRequestsUrl omits optional conditions", () => {
   const url = new URL(buildRequestsUrl("https://ssl.wf.jobcan.jp/wf_api/", {}));

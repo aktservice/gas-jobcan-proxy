@@ -27,7 +27,7 @@ Jobcan API トークンはコードに埋め込みません。ローカル開発
 ## ディレクトリ構成
 
 ```
-app/src/
+backend/
   main.ts                 # GASのグローバル関数登録（onOpen/doGet/showHtml/init/debugFetchAndDump/getScriptUrl）
   event.ts                # onOpen（メニュー追加）、showHtml（ダイアログ表示）
   restSample.ts            # debugFetchAndDump（デバッグ用シート書き出し）
@@ -80,7 +80,7 @@ requestSearch.ts                    [core/requestSearch.ts]
 
 | スクリプト | 内容 |
 |---|---|
-| `npm run build` | `dist/` を再生成し、`static/` をコピーしてから `app/src/main.ts` を `dist/main.js` にバンドル |
+| `npm run build` | `dist/` を再生成し、`static/` をコピーしてから `backend/main.ts` を `dist/main.js` にバンドル |
 | `npm run typecheck` | TypeScriptの型チェックを実行 |
 | `npm test` | `test/*.test.ts` を `ts-node/esm` ローダーで実行（Node標準 `node:test`） |
 | `npm run check` | `typecheck` → `test` |
@@ -92,7 +92,7 @@ requestSearch.ts                    [core/requestSearch.ts]
 
 ## テスト
 
-`app/src/core/requestSearch.ts` はGAS依存がないため、Node上で直接テストできます。
+`backend/core/requestSearch.ts` はGAS依存がないため、Node上で直接テストできます。
 
 ```bash
 npm test
@@ -102,7 +102,7 @@ npm test
 
 ## 型定義（job2.d.ts）について
 
-`app/src/@types/job2.d.ts` は `json-schema-to-typescript` による自動生成ファイルです（ファイル冒頭にも明記あり）。**直接編集しない**でください。Jobcan APIのレスポンス構造が変わった場合は、元のJSON Schemaを更新して再生成する運用を想定しています（現状リポジトリ内に生成元のスキーマファイルは含まれていないため、生成コマンドの再現には別途スキーマの用意が必要です）。
+`backend/@types/job2.d.ts` は `json-schema-to-typescript` による自動生成ファイルです（ファイル冒頭にも明記あり）。**直接編集しない**でください。Jobcan APIのレスポンス構造が変わった場合は、元のJSON Schemaを更新して再生成する運用を想定しています（現状リポジトリ内に生成元のスキーマファイルは含まれていないため、生成コマンドの再現には別途スキーマの用意が必要です）。
 
 ## 認証・設定値
 

@@ -1,4 +1,4 @@
-// app/src/@types/global.d.ts
+// backend/@types/global.d.ts
 
 declare var global: {
   [key: string]: any;

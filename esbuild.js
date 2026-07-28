@@ -4,10 +4,10 @@ import { cp, rm } from "node:fs/promises";
 
 async function build() {
   await rm("./dist", { recursive: true, force: true });
-  await cp("./app/src/static", "./dist", { recursive: true });
+  await cp("./backend/static", "./dist", { recursive: true });
 
   await esbuild.build({
-    entryPoints: ["./app/src/main.ts"],
+    entryPoints: ["./backend/main.ts"],
     bundle: true,
     minify: false,
     minifyWhitespace: false,

@@ -10,8 +10,8 @@
     "noEmit": true // esbuildが書き出しを行うので、tscには書き出させない
   },
   "include": [
-    "app/src/**/*.ts",
-    "app/src/@types/**/*.d.ts",
+    "backend/**/*.ts",
+    "backend/@types/**/*.d.ts",
     "test/**/*.ts"
   ] // 今のesbuildの入り口に合わせて調整
 }
