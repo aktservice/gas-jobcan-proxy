@@ -1,29 +1,21 @@
 {
-  "name": "gas-esbuild-temp",
+  "name": "jobcan-rest",
   "version": "1.0.0",
   "type": "module",
-  "description": "bundle for gas",
+  "description": "Jobcan REST API proxy for Google Apps Script",
   "author": "yoshikoro",
   "license": "ISC",
-  "dependencies": {
-    "@types/google-apps-script": "^2.0.8"
-  },
   "scripts": {
     "build": "node ./esbuild.js",
-    "nbuild": "tsc",
+    "typecheck": "tsc",
+    "test": "node --loader ts-node/esm test/*.test.ts",
+    "check": "npm run typecheck && npm test",
     "push": "clasp push",
-    "open": "clasp open",
-    "cpapps": "cp ./appsscript.json ./app/dist/appsscript.json",
-    "cpstatic": "cp ./src/static/* ./dist/",
-    "nodecp": "node -e \"require('fs').cpSync('./appsscript.json','./dist/appsscript.json',{recursive:true})\"",
-    "nodecpw": "node -e \"require('fs').cpSync('./app/src/static/', './dist/', {recursive: true})\"",
-    "cp": "npm run nodecp && npm run node cpw",
-    "adeploy": "npm run nodecpw && npm run build && npm run push",
-    "deploy": "npm run build && npm run push",
-    "ndeploy": "npm run nbuild && npm run push",
-    "clearn": "rm -f ./dist/*"
+    "deploy": "npm run check && npm run build && npm run push",
+    "open": "clasp open"
   },
   "devDependencies": {
+    "@types/google-apps-script": "^2.0.8",
     "@types/node": "^25.2.0",
     "esbuild": "^0.27.2",
     "esbuild-gas-plugin": "^0.10.0",

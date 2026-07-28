@@ -1,7 +1,12 @@
 import esbuild from "esbuild";
 import { GasPlugin } from "esbuild-gas-plugin";
-esbuild
-  .build({
+import { cp, rm } from "node:fs/promises";
+
+async function build() {
+  await rm("./dist", { recursive: true, force: true });
+  await cp("./app/src/static", "./dist", { recursive: true });
+
+  await esbuild.build({
     entryPoints: ["./app/src/main.ts"],
     bundle: true,
     minify: false,
@@ -14,8 +19,10 @@ esbuild
     plugins: [GasPlugin],
     legalComments: "inline", // コメントを残す
     charset: "utf8", //アスキーコードではなく
-  })
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
   });
+}
+
+build().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

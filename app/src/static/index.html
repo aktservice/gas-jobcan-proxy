@@ -50,7 +50,7 @@
 
             // data-query内の日付（2026-02-01等）を動的な日付に置換
             // 今回はスラッシュ区切り（YYYY/MM/DD）を希望とのことなのでそのまま代入
-            query = query.replace(/\d{4}-\d{2}-\d{2}/, targetDate);
+            query = query.replace(/\d{4}-\d{2}-\d{2}/g, targetDate);
 
             const fullUrl = url + query;
             link.href = fullUrl;
@@ -71,9 +71,30 @@
     <h1 class="mb-4">Jobcan Proxy API 🚀</h1>
     <p class="text-muted">Jobcan APIへのリクエストを中継するプロキシサービスです。</p>
 
+    <div class="alert alert-info" role="alert">
+      <code>walk</code> と <code>detail</code> は既存連携との互換性のため維持しています。新規連携では
+      <code>requests</code> を利用してください。
+    </div>
+
+    <div class="card endpoint-card shadow-sm" style="border-left-color: #6f42c1;">
+      <div class="card-body">
+        <h5 class="card-title">1. 申請一覧検索 (Requests)</h5>
+        <p class="card-text">日付範囲・フォーム・ステータスで申請を検索します。条件に一致する全ページを返します。</p>
+        <table class="table table-sm">
+          <tr><th>action</th><td><code>requests</code></td></tr>
+          <tr><th>start / end</th><td>任意。<code>YYYY/MM/DD</code> の申請日範囲</td></tr>
+          <tr><th>status</th><td>任意。未指定時は全ステータス</td></tr>
+          <tr><th>form_id</th><td>任意。指定時は <code>form_name</code> より優先</td></tr>
+          <tr><th>form_name</th><td>任意。完全一致</td></tr>
+        </table>
+        <h6>Example:</h6>
+        <pre><a href="#" class="api-link" data-query="?action=requests&start=2026-02-01&end=2026-02-28&status=completed&form_id=12345" target="_blank">Loading...</a></pre>
+      </div>
+    </div>
+
     <div class="card endpoint-card shadow-sm">
       <div class="card-body">
-        <h5 class="card-title">1. 全件取得 (Walk)</h5>
+        <h5 class="card-title">2. 既存: 進行中一覧取得 (Walk)</h5>
         <p class="card-text">指定した日付以降の申請データを全件取得します。</p>
         <table class="table table-sm">
           <tr>
@@ -82,7 +103,7 @@
           </tr>
           <tr>
             <th>date</th>
-            <td><code>YYYY-MM-DD</code></td>
+            <td><code>YYYY/MM/DD</code></td>
           </tr>
         </table>
         <h6>Example:</h6>
@@ -92,7 +113,7 @@
 
     <div class="card endpoint-card shadow-sm" style="border-left-color: #198754;">
       <div class="card-body">
-        <h5 class="card-title">2. 詳細取得 (Detail)</h5>
+        <h5 class="card-title">3. 既存: 詳細取得 (Detail)</h5>
         <p class="card-text">申請IDを指定して、カスタマイズ項目を含む詳細を取得します。</p>
         <table class="table table-sm">
           <tr>

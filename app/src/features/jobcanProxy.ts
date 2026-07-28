@@ -1,4 +1,9 @@
 import { RestJobcan } from "../core/JobcanRestClass";
+import {
+  REQUEST_STATUSES,
+  type RequestSearchOptions,
+  type RequestStatus,
+} from "../core/requestSearch";
 
 /**
  * Jobcan Proxy のメインハンドラー
@@ -37,6 +42,16 @@ export function handleJobcanProxy(e: GoogleAppsScript.Events.DoGet) {
         return createJsonResponse({ status: "success", data: detail });
       }
 
+      case "requests": {
+        const options = parseRequestSearchOptions(e.parameter);
+        const results = jobcan.listRequests(options);
+        return createJsonResponse({
+          status: "success",
+          count: results.length,
+          data: results,
+        });
+      }
+
       default:
         throw new Error(`Unknown action: ${action}`);
     }
@@ -46,6 +61,67 @@ export function handleJobcanProxy(e: GoogleAppsScript.Events.DoGet) {
       message: error instanceof Error ? error.message : String(error),
     });
   }
+}
+
+function parseRequestSearchOptions(
+  parameter: Record<string, string | undefined>,
+): RequestSearchOptions {
+  const start = optionalParameter(parameter.start);
+  const end = optionalParameter(parameter.end);
+  const status = optionalParameter(parameter.status);
+  const formId = optionalParameter(parameter.form_id);
+  const formName = optionalParameter(parameter.form_name);
+
+  if (start && !isValidDate(start)) {
+    throw new Error("Parameter 'start' must use YYYY/MM/DD format");
+  }
+  if (end && !isValidDate(end)) {
+    throw new Error("Parameter 'end' must use YYYY/MM/DD format");
+  }
+  if (start && end && start > end) {
+    throw new Error("Parameter 'start' must be on or before 'end'");
+  }
+
+  if (status && !REQUEST_STATUSES.includes(status as RequestStatus)) {
+    throw new Error(`Parameter 'status' is invalid: ${status}`);
+  }
+
+  let parsedFormId: number | undefined;
+  if (formId) {
+    if (!/^\d+$/.test(formId) || !Number.isSafeInteger(Number(formId)) || Number(formId) < 1) {
+      throw new Error("Parameter 'form_id' must be a positive integer");
+    }
+    parsedFormId = Number(formId);
+  }
+
+  return {
+    appliedAfter: start,
+    appliedBefore: end,
+    status: status as RequestStatus | undefined,
+    formId: parsedFormId,
+    formName,
+  };
+}
+
+function optionalParameter(value: string | undefined): string | undefined {
+  const normalized = value?.trim();
+  return normalized || undefined;
+}
+
+function isValidDate(value: string): boolean {
+  const match = /^(\d{4})\/(\d{2})\/(\d{2})$/.exec(value);
+  if (!match) return false;
+
+  const [, year, month, day] = match;
+  const parsedYear = Number(year);
+  const parsedMonth = Number(month);
+  const parsedDay = Number(day);
+  return (
+    parsedMonth >= 1 &&
+    parsedMonth <= 12 &&
+    parsedDay >= 1 &&
+    parsedDay <= new Date(parsedYear, parsedMonth, 0).getDate()
+  );
 }
 
 /**

@@ -1,3 +1,11 @@
+import {
+  buildRequestsUrl,
+  collectAllPages,
+  filterByFormName,
+  type RequestSearchOptions,
+  type RequestStatus,
+} from "./requestSearch";
+
 //ref job2.d.ts
 /**
  * @description ジョブカンに接続するクラス
@@ -7,7 +15,7 @@
  * @class RestJobcan
  */
 export class RestJobcan {
-  private BASEURL = `https://ssl.wf.jobcan.jp/wf_api/`;
+  private readonly BASEURL = "https://ssl.wf.jobcan.jp/wf_api/";
   private token = "";
   constructor(token?: string) {
     const finalToken =
@@ -30,50 +38,26 @@ export class RestJobcan {
     startDate: string,
     callback: (request: Jobcan.V2RequestResult) => void,
   ) {
-    let nextUrl: string | undefined = undefined;
-    let hasNext = true;
-
-    while (hasNext) {
-      const response = this.getRequests(startDate, nextUrl);
-      const requests = response.results;
-
-      if (!requests || requests.length === 0) break;
-
-      requests.forEach(callback);
-
-      if (response.next) {
-        nextUrl = response.next;
-      } else {
-        hasNext = false;
-      }
-    }
+    this.listRequests({ appliedAfter: startDate, status: "in_progress" }).forEach(
+      callback,
+    );
   }
 
-  /**
-   * @description
-   * @author yoshitaka <sato-yoshitaka@aktio.co.jp>
-   * @date 05/11/2024
-   * @param {string} appliedAfter
-   * @param {string} [nextURL]
-   * @param {Jobcan.jobcanStatusRequest} [status="in_progress"]
-   * @returns {*}  {Jobcan.V2result}
-   * @memberof RestJobcan
-   */
-  public getRequests(
-    appliedAfter: string,
-    nextURL?: string | undefined,
-    status: Jobcan.jobcanStatusRequest = "in_progress", //"in_progress"
-  ): Jobcan.V2result {
-    let baseurl: string = this.BASEURL;
-    if (nextURL) {
-      baseurl = nextURL;
-    }
-    const reqString: string = `?applied_after=${appliedAfter}&status=${status}`;
+  /** Retrieve one Jobcan request-list page. */
+  public getRequests(options: RequestSearchOptions = {}): Jobcan.V2result {
+    const requestUrl = buildRequestsUrl(this.BASEURL, options);
+    return this.getFetch<Jobcan.V2result>(requestUrl);
+  }
 
-    const requestUrl: string = `${baseurl}v2/requests/${reqString}`;
-
-    let result: Jobcan.V2result = this.getFetch(requestUrl);
-    return result;
+  /** Retrieve every page, then apply proxy-only filters. */
+  public listRequests(
+    options: RequestSearchOptions = {},
+  ): Jobcan.V2RequestResult[] {
+    const initialUrl = buildRequestsUrl(this.BASEURL, options);
+    const requests = collectAllPages<Jobcan.V2RequestResult>(initialUrl, (url) =>
+      this.getFetch<Jobcan.V2result>(url),
+    );
+    return filterByFormName(requests, options);
   }
   /**
    * @description ジョブカンへ接続して情報を取得する

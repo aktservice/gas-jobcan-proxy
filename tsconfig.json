@@ -11,6 +11,7 @@
   },
   "include": [
     "app/src/**/*.ts",
-    "app/src/@types/**/*.d.ts"
+    "app/src/@types/**/*.d.ts",
+    "test/**/*.ts"
   ] // 今のesbuildの入り口に合わせて調整
 }

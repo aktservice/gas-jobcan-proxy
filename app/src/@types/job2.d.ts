@@ -215,7 +215,7 @@ declare namespace Jobcan {
   }
   interface V2result {
     count: number;
-    next: string;
+    next: string | null;
     previous: null;
     results: V2RequestResult[];
   }
@@ -255,5 +255,6 @@ declare namespace Jobcan {
     | "completed"
     | "rejected"
     | "returned"
+    | "canceled"
     | "canceled_after_completion";
 }
