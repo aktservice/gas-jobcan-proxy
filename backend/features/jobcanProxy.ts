@@ -63,6 +63,10 @@ export function handleJobcanProxy(e: GoogleAppsScript.Events.DoGet) {
   }
 }
 
+/**
+ * doGet のクエリパラメータ（start/end/status/form_id/form_name）を検証し、
+ * RequestSearchOptions へ変換する。値が不正な場合は Error を投げる。
+ */
 function parseRequestSearchOptions(
   parameter: Record<string, string | undefined>,
 ): RequestSearchOptions {
@@ -103,11 +107,13 @@ function parseRequestSearchOptions(
   };
 }
 
+/** 空文字・空白のみの値を undefined として扱う（未指定パラメータの正規化） */
 function optionalParameter(value: string | undefined): string | undefined {
   const normalized = value?.trim();
   return normalized || undefined;
 }
 
+/** "YYYY/MM/DD" 形式かつ実在する日付かどうかを検証する */
 function isValidDate(value: string): boolean {
   const match = /^(\d{4})\/(\d{2})\/(\d{2})$/.exec(value);
   if (!match) return false;
