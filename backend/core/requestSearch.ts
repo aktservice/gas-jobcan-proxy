@@ -10,17 +10,24 @@ export const REQUEST_STATUSES = [
 
 export type RequestStatus = (typeof REQUEST_STATUSES)[number];
 
+/** ジョブカン申請一覧APIへ渡す検索条件 */
 export interface RequestSearchOptions {
+  /** 申請日の下限（YYYY/MM/DD） */
   appliedAfter?: string;
+  /** 申請日の上限（YYYY/MM/DD） */
   appliedBefore?: string;
+  /** 申請ステータス */
   status?: RequestStatus;
+  /** フォームID（ジョブカン側でフィルタされる） */
   formId?: number;
   /** Applied locally because Jobcan's list API has no form-name parameter. */
   formName?: string;
 }
 
+/** ジョブカン申請一覧APIの1ページ分のレスポンス */
 export interface RequestListPage<T> {
   results?: T[];
+  /** 次ページの絶対URL。存在しない場合はnull/undefined */
   next?: string | null;
 }
 
@@ -30,6 +37,7 @@ export function buildRequestsUrl(
   options: RequestSearchOptions,
 ): string {
   const parameters: string[] = [];
+  // URLエンコードした「key=value」をクエリパラメータ配列へ追加する
   const add = (name: string, value: string) => {
     parameters.push(`${encodeURIComponent(name)}=${encodeURIComponent(value)}`);
   };
@@ -63,6 +71,10 @@ export function collectAllPages<T>(
   return allResults;
 }
 
+/**
+ * options.formName に一致する申請だけへ絞り込む（プロキシ側のローカルフィルタ）。
+ * formId 指定時はジョブカン側で既にフィルタ済みのため、このフィルタは適用しない。
+ */
 export function filterByFormName<T extends { form_name: string }>(
   requests: T[],
   options: RequestSearchOptions,
